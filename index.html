@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="el">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Υπολογισμός Βαρδιών</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            padding: 20px;
+        }
+        .result {
+            margin-top: 20px;
+            padding: 10px;
+            border: 1px solid #000;
+        }
+    </style>
+</head>
+<body>
+    <h1>Υπολογισμός Βαρδιών</h1>
+    <label for="targetInput">Παρακαλώ εισάγετε την ημερομηνία (ηη/μμ/εεεε) ή βάρδια ('Πρωί', 'Απόγευμα', 'Βράδυ', 'Αδιάθετο', 'Ρεπό'): </label>
+    <input type="text" id="targetInput" placeholder="π.χ. 27/5/2024 ή Απόγευμα">
+    <button onclick="calculateShift()">Υπολογισμός</button>
+
+    <div id="output" class="result"></div>
+
+    <script>
+        const shifts = ["Πρωί", "Απόγευμα", "Βράδυ", "Αδιάθετο", "Ρεπό"];
+        const startDate = new Date("2024-05-27");
+        const startShift = "Απόγευμα";
+
+        function findNextShifts(startDate, startShift, targetShift, count = 10) {
+            let days = [];
+            let currentDate = new Date(startDate);
+            let currentShiftIndex = shifts.indexOf(startShift);
+            let foundCount = 0;
+
+            while (foundCount < count) {
+                if (shifts[currentShiftIndex] === targetShift) {
+                    days.push(currentDate.toLocaleDateString('el-GR'));
+                    foundCount++;
+                }
+                currentDate.setDate(currentDate.getDate() + 1);
+                currentShiftIndex = (currentShiftIndex + 1) % shifts.length;
+            }
+
+            return days;
+        }
+
+        function calculateShift() {
+            const targetInput = document.getElementById("targetInput").value.trim();
+            const output = document.getElementById("output");
+            output.innerHTML = "";
+
+            if (shifts.includes(targetInput)) {
+                const nextShifts = findNextShifts(startDate, startShift, targetInput);
+                output.innerHTML = `<h2>Οι επόμενες 10 ημερομηνίες για τη βάρδια '${targetInput}' είναι:</h2><ul>`;
+                nextShifts.forEach(date => {
+                    output.innerHTML += `<li>${date}</li>`;
+                });
+                output.innerHTML += "</ul>";
+            } else {
+                try {
+                    const targetDate = new Date(targetInput.split("/").reverse().join("-"));
+                    if (isNaN(targetDate)) {
+                        throw new Error("Invalid Date");
+                    }
+
+                    const daysDifference = Math.floor((targetDate - startDate) / (1000 * 60 * 60 * 24));
+                    const startShiftIndex = shifts.indexOf(startShift);
+                    const targetShiftIndex = (startShiftIndex + daysDifference) % shifts.length;
+                    const targetShift = shifts[targetShiftIndex];
+
+                    const weekdays = ["Δευτέρα", "Τρίτη", "Τετάρτη", "Πέμπτη", "Παρασκευή", "Σάββατο", "Κυριακή"];
+                    const targetWeekday = weekdays[targetDate.getDay()];
+
+                    output.innerHTML = `
+                        <h2>Αποτέλεσμα:</h2>
+                        <p><strong>Ημερομηνία:</strong> ${targetDate.toLocaleDateString('el-GR')}</p>
+                        <p><strong>Ημέρα:</strong> ${targetWeekday}</p>
+                        <p><strong>Βάρδια:</strong> ${targetShift}</p>
+                    `;
+                } catch (error) {
+                    output.innerHTML = "<p>Λάθος μορφή ημερομηνίας. Παρακαλώ δοκιμάστε ξανά.</p>";
+                }
+            }
+        }
+    </script>
+</body>
+</html>
