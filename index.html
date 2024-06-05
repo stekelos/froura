@@ -31,9 +31,13 @@
 
         function findNextShifts(startDate, startShift, targetShift, count = 10) {
             let days = [];
-            let currentDate = new Date(startDate);
+            let currentDate = new Date();
             let currentShiftIndex = shifts.indexOf(startShift);
             let foundCount = 0;
+
+            // Adjust currentShiftIndex based on the days difference from the startDate
+            const daysDifferenceFromStart = Math.floor((currentDate - startDate) / (1000 * 60 * 60 * 24));
+            currentShiftIndex = (currentShiftIndex + daysDifferenceFromStart) % shifts.length;
 
             while (foundCount < count) {
                 if (shifts[currentShiftIndex] === targetShift) {
@@ -53,7 +57,7 @@
             output.innerHTML = "";
 
             if (shifts.includes(targetInput)) {
-                const nextShifts = findNextShifts(new Date(), startShift, targetInput);
+                const nextShifts = findNextShifts(startDate, startShift, targetInput);
                 output.innerHTML = `<h2>Οι επόμενες 10 ημερομηνίες για τη βάρδια '${targetInput}' είναι:</h2><ul>`;
                 nextShifts.forEach(date => {
                     output.innerHTML += `<li>${date}</li>`;
@@ -67,7 +71,7 @@
                     }
 
                     const today = new Date();
-                    const daysDifference = Math.floor((targetDate - today) / (1000 * 60 * 60 * 24));
+                    const daysDifference = Math.floor((targetDate - startDate) / (1000 * 60 * 60 * 24));
                     const startShiftIndex = shifts.indexOf(startShift);
                     const targetShiftIndex = (startShiftIndex + daysDifference) % shifts.length;
                     const targetShift = shifts[targetShiftIndex];
