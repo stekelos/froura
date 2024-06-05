@@ -53,7 +53,7 @@
             output.innerHTML = "";
 
             if (shifts.includes(targetInput)) {
-                const nextShifts = findNextShifts(startDate, startShift, targetInput);
+                const nextShifts = findNextShifts(new Date(), startShift, targetInput);
                 output.innerHTML = `<h2>Οι επόμενες 10 ημερομηνίες για τη βάρδια '${targetInput}' είναι:</h2><ul>`;
                 nextShifts.forEach(date => {
                     output.innerHTML += `<li>${date}</li>`;
@@ -66,12 +66,13 @@
                         throw new Error("Invalid Date");
                     }
 
-                    const daysDifference = Math.floor((targetDate - startDate) / (1000 * 60 * 60 * 24));
+                    const today = new Date();
+                    const daysDifference = Math.floor((targetDate - today) / (1000 * 60 * 60 * 24));
                     const startShiftIndex = shifts.indexOf(startShift);
                     const targetShiftIndex = (startShiftIndex + daysDifference) % shifts.length;
                     const targetShift = shifts[targetShiftIndex];
 
-                    const weekdays = ["Δευτέρα", "Τρίτη", "Τετάρτη", "Πέμπτη", "Παρασκευή", "Σάββατο", "Κυριακή"];
+                    const weekdays = ["Κυριακή", "Δευτέρα", "Τρίτη", "Τετάρτη", "Πέμπτη", "Παρασκευή", "Σάββατο"];
                     const targetWeekday = weekdays[targetDate.getDay()];
 
                     output.innerHTML = `
